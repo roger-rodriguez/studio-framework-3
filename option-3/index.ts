@@ -54,10 +54,9 @@ export const properties = async () => {
  * Export: App Fields
  ****************************/
 export const fields = async () => {
-  const product = await useDataLoader();
   return {
     fields: [productCategory, productRecommendationSku],
-    fieldData: { ...product },
+    fieldData: {},
   };
 };
 
