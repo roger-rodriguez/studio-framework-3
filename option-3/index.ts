@@ -1,10 +1,11 @@
-import { useDataSourceLoader } from "@movable/datasource";
+// import { useDataLoader } from "@movable/datasource";
 import {
   useAppDataSources,
   useAppFields,
   useAppProperties,
   useMIContextualData,
   useDynamicFields,
+  useDataLoader,
 } from "@movable/studio";
 
 export const dataLoader = async () => {
@@ -53,7 +54,7 @@ export const dataLoader = async () => {
 // }
 
 export async function properties() {
-  const product = await useDataSourceLoader();
+  const product = await useDataLoader();
   const isOnSale = product.info.isSaleItem;
   return {
     properties: [productTitle, productImage, isSaleProduct],
@@ -62,7 +63,7 @@ export async function properties() {
 }
 
 export async function fields() {
-  const product = await useDataSourceLoader();
+  const product = await useDataLoader();
   return {
     fields: [categoryType],
     fieldData: { ...product },
