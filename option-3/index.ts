@@ -1,9 +1,9 @@
 // import { useDataLoader } from "@movable/datasource";
 import {
-  useAppDataSources,
-  useAppFields,
-  useAppProperties,
-  useMIContextualData,
+  useDataSources,
+  useFields,
+  useProperties,
+  useContextualData,
   useDynamicFields,
   useDataLoader,
 } from "@movable/studio";
@@ -12,10 +12,10 @@ import {
  * Export: Data Loader
  ****************************/
 export const dataLoader = async () => {
-  const appFields = useAppFields();
-  const appProperties = useAppProperties();
-  const appDataSources = useAppDataSources();
-  const mi = useMIContextualData();
+  const appFields = useFields();
+  const appProperties = useProperties();
+  const appDataSources = useDataSources();
+  const mi = useContextualData();
 
   let recommendedProductSku = appFields.productRecommendationSku;
 
@@ -90,7 +90,7 @@ const productTitle = ({ propertyData }) => {
 };
 
 const productImage = ({ propertyData }) => {
-  const { productCategory } = useAppFields();
+  const { productCategory } = useFields();
   const { productIndex } = useDynamicFields();
   return {
     type: "image",
