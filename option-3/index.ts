@@ -1,10 +1,20 @@
 import { useDataSourceLoader } from "@movable/datasource";
-import { useAppFields } from "@movable/studio";
+import {
+  useAppDataSources,
+  useAppFields,
+  useAppProperties,
+  useMIContextualData,
+  useDynamicFields,
+} from "@movable/studio";
 
-export async function dataSourceLoader({ contextualData, ds }) {
-  const { mi, merged } = contextualData;
+export const dataLoader = async () => {
+  const appFields = useAppFields();
+  const appProperties = useAppProperties();
+  const appDataSources = useAppDataSources();
+  const mi = useMIContextualData();
+  const merged = useDynamicFields();
 
-  const isProductAvailableInZip = await ds.get("productsByZipCSV", {
+  const isProductAvailableInZip = await appDataSources("productsByZipCSV", {
     zip: mi.zip,
   });
 
@@ -12,15 +22,35 @@ export async function dataSourceLoader({ contextualData, ds }) {
     throw new Error("Product not available in this zip code");
   }
 
-  const appFields = useAppFields();
-  const { token } = await ds.get("authAPI", {});
-  const { products } = await ds.get("productAPI", {
+  const { token } = await appDataSources("authAPI", {});
+  const { products } = await appDataSources("productAPI", {
     auth: token,
     category: merged.mi_category || appFields.productCategory,
   });
 
   return { ...products[merged.itemIndex] };
-}
+};
+
+// export async function dataSourceLoader({ contextualData, ds }) {
+//   const { mi, merged } = contextualData;
+
+//   const isProductAvailableInZip = await ds.get("productsByZipCSV", {
+//     zip: mi.zip,
+//   });
+
+//   if (!isProductAvailableInZip) {
+//     throw new Error("Product not available in this zip code");
+//   }
+
+//   const appFields = useAppFields();
+//   const { token } = await ds.get("authAPI", {});
+//   const { products } = await ds.get("productAPI", {
+//     auth: token,
+//     category: merged.mi_category || appFields.productCategory,
+//   });
+
+//   return { ...products[merged.itemIndex] };
+// }
 
 export async function properties() {
   const product = await useDataSourceLoader();
