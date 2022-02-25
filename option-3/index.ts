@@ -11,7 +11,6 @@ import {
 /****************************
  * Data Loader
  ****************************/
-
 export const dataLoader = async () => {
   const appFields = useAppFields();
   const appProperties = useAppProperties();
@@ -39,6 +38,9 @@ export const dataLoader = async () => {
   return { ...selectedProduct };
 };
 
+/****************************
+ * App Properties Export
+ ****************************/
 export async function properties() {
   const product = await useDataLoader();
   const isOnSale = product.info.isSaleItem;
@@ -48,6 +50,9 @@ export async function properties() {
   };
 }
 
+/****************************
+ * App Fields Export
+ ****************************/
 export async function fields() {
   const product = await useDataLoader();
   return {
