@@ -1,31 +1,37 @@
 export default ({ dataSourceData }) => {
-  const isOnSale = false;
+  const isOnSale = dataSourceData.product.info.isSale;
   return {
-    properties: [productTitle, productImage, isSaleProduct],
-    propertyData: { ...dataSourceData, isOnSale },
+    properties: [productTitle, productImage, isSaleProduct, productOnSaleBadge],
+    propertyData: { isOnSale },
   };
 };
 
 export const productTitle = ({ propertyData }) => {
-  const productTitle = propertyData.isOnSale
-    ? propertyData.productTitle
-    : "Not on sale";
-
   return {
     type: "text",
     name: "Product Title",
-    value: productTitle,
+    value: propertyData.productTitle,
     fallback: "",
     context: {},
   };
 };
 
 export const productImage = ({ propertyData }) => {
-  const productImage = propertyData.productImage;
   return {
     type: "image",
     name: "Product Image",
-    value: productImage,
+    value: propertyData.productImage,
+    fallback: "",
+    context: {},
+  };
+};
+
+export const productOnSaleBadge = ({ propertyData }) => {
+  return {
+    type: "text",
+    name: "Product On Sale Badge",
+    value: propertyData.isOnSale ? "On Sale" : "",
+    fallback: "",
     context: {},
   };
 };
@@ -35,6 +41,7 @@ export const isSaleProduct = ({ propertyData }) => {
     type: "boolean",
     name: "Product On Sale?",
     value: Boolean(propertyData.isOnSale),
+    fallback: "",
     context: {},
   };
 };

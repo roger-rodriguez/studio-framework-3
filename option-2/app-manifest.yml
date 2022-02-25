@@ -1,0 +1,19 @@
+name: Product Category App
+integration_ids:
+  - 00180000015i6kc
+authors:
+  - Solutions Developer <se@movableink.com>
+javascript_file: dist/index.js
+html_file: app/index.html
+css_file: app/styles/style.css
+description: Display products in a category
+category: "data: rendering"
+icon_v2: tools
+width: 350
+height: 520
+expose_advanced_options: true
+capture_options:
+  timeout: 8s
+  cache_ttl: 60s
+query_params:
+  mi_category: "[mi_category]"

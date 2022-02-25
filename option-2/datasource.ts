@@ -14,16 +14,16 @@ export default (req, res) => {
   const { value } = useFields({ name: "productCategory" });
 
   const productCategory = value === "Mens" ? "m" : "w";
-  const { data, error } = useDataSource({
+  const { data, status } = useDataSource({
     key: "1234",
     lat,
     lon,
     cat: productCategory,
   });
 
-  if (error) {
-    logger.metric({ client: clientId, campaign: campaignId, msg: error.msg });
-    return res.status(500).json(error.msg);
+  if (status !== 200) {
+    logger.metric({ client: clientId, campaign: campaignId, msg: "error" });
+    return res.status(500).json({ dataSourceData: {}, contextData: {} });
   }
 
   logger.debug(`response from api: `, data);
