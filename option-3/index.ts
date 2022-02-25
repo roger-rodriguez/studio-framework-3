@@ -9,7 +9,7 @@ import {
 } from "@movable/studio";
 
 /****************************
- * Data Loader
+ * Export: Data Loader
  ****************************/
 export const dataLoader = async () => {
   const appFields = useAppFields();
@@ -39,30 +39,30 @@ export const dataLoader = async () => {
 };
 
 /****************************
- * App Properties Export
+ * Export: App Properties
  ****************************/
-export async function properties() {
+export const properties = async () => {
   const product = await useDataLoader();
   const isOnSale = product.info.isSaleItem;
   return {
     properties: [productTitle, productImage],
     propertyData: { ...product, isOnSale },
   };
-}
+};
 
 /****************************
- * App Fields Export
+ * Export: App Fields
  ****************************/
-export async function fields() {
+export const fields = async () => {
   const product = await useDataLoader();
   return {
     fields: [productCategory, productRecommendationSku],
     fieldData: { ...product },
   };
-}
+};
 
 /****************************
- * App Properties
+ * App Properties Declarations
  ****************************/
 
 const productTitle = ({ propertyData }) => {
@@ -118,7 +118,7 @@ const productImage = ({ propertyData }) => {
 };
 
 /****************************
- * App Fields
+ * App Fields Declarations
  ****************************/
 
 const productCategory = () => {
