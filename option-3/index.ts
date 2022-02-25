@@ -8,56 +8,42 @@ import {
   useDataLoader,
 } from "@movable/studio";
 
+/****************************
+ * Data Loader
+ ****************************/
+
 export const dataLoader = async () => {
   const appFields = useAppFields();
   const appProperties = useAppProperties();
   const appDataSources = useAppDataSources();
   const mi = useMIContextualData();
-  const merged = useDynamicFields();
 
-  const isProductAvailableInZip = await appDataSources("productsByZipCSV", {
-    zip: mi.zip,
-  });
+  let recommendedProductSku = appFields.productRecommendationSku;
 
-  if (!isProductAvailableInZip) {
-    throw new Error("Product not available in this zip code");
+  if (!recommendedProductSku) {
+    console.log("...getting product recommendation");
+    recommendedProductSku = await appDataSources("productRecommendationAPI", {
+      zip: mi.zip,
+      campaignId: mi.campaignId,
+    });
   }
 
   const { token } = await appDataSources("authAPI", {});
   const { products } = await appDataSources("productAPI", {
     auth: token,
-    category: merged.mi_category || appFields.productCategory,
+    sku: recommendedProductSku,
   });
+  const selectedProduct =
+    products[appProperties.productTitle.context.productIndex];
 
-  return { ...products[merged.itemIndex] };
+  return { ...selectedProduct };
 };
-
-// export async function dataSourceLoader({ contextualData, ds }) {
-//   const { mi, merged } = contextualData;
-
-//   const isProductAvailableInZip = await ds.get("productsByZipCSV", {
-//     zip: mi.zip,
-//   });
-
-//   if (!isProductAvailableInZip) {
-//     throw new Error("Product not available in this zip code");
-//   }
-
-//   const appFields = useAppFields();
-//   const { token } = await ds.get("authAPI", {});
-//   const { products } = await ds.get("productAPI", {
-//     auth: token,
-//     category: merged.mi_category || appFields.productCategory,
-//   });
-
-//   return { ...products[merged.itemIndex] };
-// }
 
 export async function properties() {
   const product = await useDataLoader();
   const isOnSale = product.info.isSaleItem;
   return {
-    properties: [productTitle, productImage, isSaleProduct],
+    properties: [productTitle, productImage],
     propertyData: { ...product, isOnSale },
   };
 }
@@ -65,7 +51,7 @@ export async function properties() {
 export async function fields() {
   const product = await useDataLoader();
   return {
-    fields: [categoryType],
+    fields: [productCategory, productRecommendationSku],
     fieldData: { ...product },
   };
 }
@@ -75,32 +61,54 @@ export async function fields() {
  ****************************/
 
 const productTitle = ({ propertyData }) => {
+  const { productIndex } = useDynamicFields();
   return {
     type: "text",
-    name: "Product Title",
+    name: "productTitle",
+    label: "Product Title",
     value: propertyData.isOnSale ? "On Sale!" : propertyData.productTitle,
     fallback: "",
-    context: {},
+    context: [
+      {
+        type: "select",
+        name: "productIndex",
+        label: "Product Index",
+        description: "Which product index to display",
+        value: productIndex ? productIndex : "0",
+        options: [
+          { value: "0", label: "First" },
+          { value: "1", label: "Second" },
+        ],
+      },
+    ],
   };
 };
 
 const productImage = ({ propertyData }) => {
+  const { productCategory } = useAppFields();
+  const { productIndex } = useDynamicFields();
   return {
     type: "image",
-    name: "Product Image",
-    value: propertyData.productImage,
+    name: "productImage",
+    label: "Product Image",
+    value:
+      productCategory === "mens"
+        ? propertyData.productImages["200"]
+        : propertyData.productImages["300"],
     fallback: "",
-    context: {},
-  };
-};
-
-const isSaleProduct = ({ propertyData }) => {
-  return {
-    type: "boolean",
-    name: "Product On Sale?",
-    value: Boolean(propertyData.isOnSale),
-    fallback: "",
-    context: {},
+    context: [
+      {
+        type: "select",
+        name: "productIndex",
+        label: "Product Index",
+        description: "Which product index to display",
+        value: productIndex ? productIndex : "0",
+        options: [
+          { value: "0", label: "First" },
+          { value: "1", label: "Second" },
+        ],
+      },
+    ],
   };
 };
 
@@ -108,7 +116,7 @@ const isSaleProduct = ({ propertyData }) => {
  * App Fields
  ****************************/
 
-const categoryType = () => {
+const productCategory = () => {
   return {
     type: "select",
     label: "Product Category",
@@ -118,5 +126,15 @@ const categoryType = () => {
       { label: "Mens", value: "Mens" },
       { label: "Womens", value: "Womens" },
     ],
+  };
+};
+
+const productRecommendationSku = () => {
+  const { productSku } = useDynamicFields();
+  return {
+    type: "text",
+    label: "Product Recommendation Sku",
+    name: "productRecommendationSku",
+    value: productSku ? productSku : "",
   };
 };
